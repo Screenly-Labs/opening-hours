@@ -1,0 +1,286 @@
+/* =========================================================================
+   Screenly Opening Hours — "Storefront board"
+   A hours plaque for retail and hospitality. The customer's real question is
+   "are you open right now?", so the hero is a big Open/Closed status, not the
+   business name. The signature: the whole board is tinted by state — a deep
+   storefront green when open, deep aubergine-ink when closed — so the answer
+   reads across a room before any text is legible. A brass tab marks today and a
+   dotted leader ties each day to its hours, borrowing the printed-plaque
+   vernacular. Tuned for unattended signage — no interaction, both orientations.
+   ========================================================================= */
+
+@import 'tailwindcss';
+
+/* Design tokens — also generate utilities (bg-open, text-gilt, font-display…). */
+@theme {
+  --color-paper: #f4efe4;
+  --color-open: #0f3d33; /* storefront viridian */
+  --color-closed: #241f2b; /* deep aubergine ink */
+  --color-gilt: #d8a657; /* brass — hairlines, today marker */
+  --color-jade: #4ecb8f; /* "open" signal */
+  --color-rose: #d98a6a; /* "closed" signal */
+  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Webfonts: self-hosted, vendored from Bun-managed @fontsource (sync-fonts.js).
+   Bricolage "standard" = optical-size + weight + width; Hanken = weight. */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/static/fonts/bricolage-grotesque-latin-standard-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/static/fonts/hanken-grotesk-latin-wght-normal.woff2') format('woff2');
+}
+
+@layer base {
+  /* One fluid root drives the whole scale; vw+vh keeps it orientation-neutral so
+     portrait and landscape resolve to the same type size. Children size in rem,
+     so the layout scales cleanly from 480px → 4K with no breakpoints. */
+  :root {
+    font-size: clamp(17px, 1vw + 1vh, 54px);
+    /* --ground and --signal flip with data-status; default to the closed look so
+       the board is composed (never blank) before JS resolves the real state. */
+    --ground: var(--color-closed);
+    --signal: var(--color-rose);
+    --leader: rgb(244 239 228 / 0.16);
+    --dim: rgb(244 239 228 / 0.62);
+  }
+
+  html[data-status='open'] {
+    --ground: var(--color-open);
+    --signal: var(--color-jade);
+  }
+  html[data-status='closed'] {
+    --ground: var(--color-closed);
+    --signal: var(--color-rose);
+  }
+
+  body {
+    min-height: 100svh;
+    background-color: var(--ground);
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* The state flip is the signature — let it cross-fade, not cut. */
+    transition: background-color 600ms ease;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+@layer components {
+  .stage {
+    display: grid;
+    place-items: center;
+    min-height: 100svh;
+    padding: clamp(1.5rem, 6vmin, 4rem);
+  }
+
+  .board {
+    width: min(88vw, 33rem);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .board__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 560;
+    font-size: 1.55rem;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  /* ---- Status: the hero -------------------------------------------------- */
+  .status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .status__lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .status__dot {
+    width: 0.62em;
+    height: 0.62em;
+    border-radius: 999px;
+    background-color: var(--signal);
+    /* A soft halo so the signal reads from a distance; strongest when open. */
+    box-shadow: 0 0 0.05em 0.02em var(--signal);
+  }
+  html[data-status='open'] .status__dot {
+    box-shadow: 0 0 0.9rem 0.02em var(--signal);
+  }
+
+  .status__word {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 640;
+    font-size: 4.4rem;
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+  }
+
+  .status__detail {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.05rem;
+    letter-spacing: 0.005em;
+    color: var(--dim);
+    min-height: 1.2em; /* reserve space so the board doesn't jump when empty */
+  }
+
+  .rule {
+    height: 2px;
+    border: 0;
+    margin: 0.2rem 0;
+    background-color: var(--color-gilt);
+    opacity: 0.7;
+  }
+
+  /* ---- The week ---------------------------------------------------------- */
+  .week {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.12rem;
+  }
+
+  .day {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.42rem 0;
+    position: relative;
+  }
+
+  .day__name {
+    flex: 0 0 auto;
+    font-weight: 500;
+    text-align: left;
+    color: var(--dim);
+  }
+
+  /* The dotted leader that ties a day to its hours — the plaque device. */
+  .day__leader {
+    flex: 1 1 auto;
+    align-self: stretch;
+    min-width: 1.5rem;
+    border-bottom: 2px dotted var(--leader);
+    transform: translateY(-0.32em);
+  }
+
+  .day__hours {
+    flex: 0 0 auto;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    color: var(--color-paper);
+  }
+
+  .day--closed .day__hours {
+    color: var(--dim);
+    font-weight: 450;
+  }
+
+  /* Today: brass tab in the margin, brighter row, gilt day name. */
+  .day--today .day__name {
+    color: var(--color-gilt);
+    font-weight: 640;
+  }
+  .day--today .day__hours {
+    font-weight: 620;
+  }
+  .day--today .day__leader {
+    border-bottom-color: rgb(216 166 87 / 0.4);
+  }
+  .day--today::before {
+    content: '';
+    position: absolute;
+    left: -1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.3rem;
+    height: 1.05em;
+    border-radius: 999px;
+    background-color: var(--color-gilt);
+  }
+
+  .board__note {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 450;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    color: var(--dim);
+    text-wrap: balance;
+  }
+
+  /* ---- Brand ------------------------------------------------------------- */
+  .brand {
+    position: fixed;
+    right: clamp(1rem, 3.2vmin, 2.4rem);
+    bottom: clamp(1rem, 3.2vmin, 2.4rem);
+    display: block;
+    opacity: 0.5;
+    transition: opacity 200ms ease;
+    border-radius: 4px;
+    outline-offset: 6px;
+  }
+  .brand:hover,
+  .brand:focus-visible {
+    opacity: 0.9;
+  }
+  .brand img {
+    display: block;
+    width: auto;
+    height: clamp(13px, 1.3rem, 26px);
+  }
+}
+
+@layer base {
+  /* One orchestrated entrance, gated for reduced-motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    .board {
+      animation: board-in 800ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+  }
+
+  @keyframes board-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.6rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}

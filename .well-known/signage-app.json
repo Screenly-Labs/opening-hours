@@ -1,0 +1,59 @@
+{
+  "manifestVersion": "1",
+  "id": "opening-hours",
+  "name": "Opening Hours",
+  "description": "A full-screen opening-hours board for retail and hospitality. Shows the week's hours with today highlighted, and tells customers at a glance whether you're open right now — the whole board turns green when you're open and dims when you're closed.",
+  "summary": "Show customers your hours — and whether you're open now.",
+  "vendor": "Screenly",
+  "tags": ["Retail", "Hospitality", "Business"],
+  "homepage": "https://opening-hours.srly.io/",
+  "source": "https://github.com/Screenly-Labs/opening-hours",
+  "support": "https://github.com/Screenly-Labs/opening-hours/issues",
+  "playback": { "pacing": "fixed", "refreshIntervalS": 3600 },
+  "settings": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "title": "Business name",
+        "x-widget": "text"
+      },
+      "tz": {
+        "type": "string",
+        "title": "Time zone",
+        "description": "Used to work out whether you're open right now.",
+        "default": "",
+        "x-widget": "timezone"
+      },
+      "format": {
+        "type": "string",
+        "title": "Clock format",
+        "default": "",
+        "enum": ["", "12", "24"],
+        "x-enumLabels": ["Match region", "12-hour", "24-hour"]
+      },
+      "mon": {
+        "type": "string",
+        "title": "Monday",
+        "x-group": "Hours",
+        "description": "e.g. 09:00-17:00, or 09:00-12:00,13:00-17:00 for a midday break. Leave blank if closed."
+      },
+      "tue": { "type": "string", "title": "Tuesday", "x-group": "Hours" },
+      "wed": { "type": "string", "title": "Wednesday", "x-group": "Hours" },
+      "thu": { "type": "string", "title": "Thursday", "x-group": "Hours" },
+      "fri": { "type": "string", "title": "Friday", "x-group": "Hours" },
+      "sat": { "type": "string", "title": "Saturday", "x-group": "Hours" },
+      "sun": { "type": "string", "title": "Sunday", "x-group": "Hours" },
+      "note": {
+        "type": "string",
+        "title": "Footer note",
+        "description": "Optional line under the hours, e.g. Closed on public holidays."
+      }
+    }
+  },
+  "launch": {
+    "baseUrl": "https://opening-hours.srly.io/",
+    "template": "{?name,tz,format,mon,tue,wed,thu,fri,sat,sun,note}"
+  }
+}

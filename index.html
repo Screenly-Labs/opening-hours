@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-49L9LJL3VH"></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+      gtag('config', 'G-49L9LJL3VH')
+    </script>
+    <title>Opening Hours</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A full-screen opening-hours board for retail and hospitality — this week's hours, today highlighted, and whether you're open right now."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%234ecb8f' stroke-width='3'/%3E%3Cpath d='M16 9v7l4.5 2.7' fill='none' stroke='%23d8a657' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
+    />
+    <link
+      rel="preload"
+      href="/static/fonts/bricolage-grotesque-latin-standard-normal.woff2?v=__ASSET_VERSION__"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/static/fonts/hanken-grotesk-latin-wght-normal.woff2?v=__ASSET_VERSION__"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="/static/styles/main.css?v=__ASSET_VERSION__" />
+    <script src="/static/js/main.js?v=__ASSET_VERSION__" defer></script>
+  </head>
+  <body>
+    <main class="stage">
+      <section class="board" aria-labelledby="biz-name">
+        <h1 class="board__name" id="biz-name">Corner Coffee</h1>
+
+        <p class="status" role="status">
+          <span class="status__lockup">
+            <span class="status__dot" aria-hidden="true"></span>
+            <span class="status__word" id="status-word">Open</span>
+          </span>
+          <span class="status__detail" id="status-detail">Open until 6:00 PM</span>
+        </p>
+
+        <hr class="rule" />
+
+        <table class="week">
+          <caption class="sr-only">Opening hours for the week</caption>
+          <tbody id="week-body">
+            <!-- Rows are (re)rendered by JS; this static example keeps the board
+                 legible pre-JS and in the store preview. -->
+            <tr class="day">
+              <th scope="row" class="day__name">Monday</th>
+              <td class="day__leader" aria-hidden="true"></td>
+              <td class="day__hours">7:00 AM – 6:00 PM</td>
+            </tr>
+            <tr class="day">
+              <th scope="row" class="day__name">Tuesday</th>
+              <td class="day__leader" aria-hidden="true"></td>
+              <td class="day__hours">7:00 AM – 6:00 PM</td>
+            </tr>
+            <tr class="day">
+              <th scope="row" class="day__name">Wednesday</th>
+              <td class="day__leader" aria-hidden="true"></td>
+              <td class="day__hours">7:00 AM – 6:00 PM</td>
+            </tr>
+            <tr class="day">
+              <th scope="row" class="day__name">Thursday</th>
+              <td class="day__leader" aria-hidden="true"></td>
+              <td class="day__hours">7:00 AM – 6:00 PM</td>
+            </tr>
+            <tr class="day">
+              <th scope="row" class="day__name">Friday</th>
+              <td class="day__leader" aria-hidden="true"></td>
+              <td class="day__hours">7:00 AM – 7:00 PM</td>
+            </tr>
+            <tr class="day">
+              <th scope="row" class="day__name">Saturday</th>
+              <td class="day__leader" aria-hidden="true"></td>
+              <td class="day__hours">8:00 AM – 7:00 PM</td>
+            </tr>
+            <tr class="day">
+              <th scope="row" class="day__name">Sunday</th>
+              <td class="day__leader" aria-hidden="true"></td>
+              <td class="day__hours">9:00 AM – 4:00 PM</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="board__note" id="note">Kitchen closes 30 minutes before we do</p>
+      </section>
+
+      <a
+        class="brand"
+        href="https://www.screenly.io"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Screenly — opens in a new tab"
+      >
+        <img src="/static/images/screenly-logo.svg?v=__ASSET_VERSION__" alt="Screenly" />
+      </a>
+    </main>
+  </body>
+</html>
