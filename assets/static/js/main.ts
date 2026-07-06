@@ -42,7 +42,7 @@ const render = (params: URLSearchParams): void => {
   const name = params.get('name')?.trim() || 'Opening hours'
   const note = params.get('note')?.trim() || ''
 
-  document.title = name === 'Opening hours' ? 'Opening Hours' : `${name} — Opening Hours`
+  document.title = name === 'Opening hours' ? 'Opening Hours' : `${name} | Opening Hours`
   text('biz-name', name)
 
   const now = zonedNow(new Date(), tz)
