@@ -1,41 +1,13 @@
 #!/usr/bin/env bun
-/* global Bun */
-// Copies the self-hosted webfont files out of the Bun-managed @fontsource
-// packages and into ./assets/static/fonts, where they're shipped to /static/fonts/.
-// Bun owns the font versions (package.json); this step vendors the exact files we
-// serve ourselves — no CDN at runtime.
-//
-// Fonts: Bricolage Grotesque (display face, "standard" axis = opsz + wght + wdth)
-// for the business name and the big Open/Closed status; Hanken Grotesk for the
-// schedule rows and their tabular numerals.
+// Vendor this app's webfonts into ./assets/static/fonts. The files, versions,
+// and copy logic all live in @screenly-labs/signage-kit — this just names the
+// families the "Storefront board" design uses (Bricolage Grotesque display +
+// Hanken Grotesk schedule numerals).
 
-const FONTS = [
-  '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-standard-normal.woff2',
-  '@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2'
-]
-const DEST_DIR = 'assets/static/fonts'
+import { syncFonts } from '@screenly-labs/signage-kit/sync-fonts'
 
-export const run = async () => {
-  let count = 0
+export const run = () => syncFonts(['bricolage-grotesque', 'hanken-grotesk'])
 
-  for (const rel of FONTS) {
-    const file = rel.split('/').pop()
-    const src = Bun.file(`node_modules/${rel}`)
-
-    if (!(await src.exists())) {
-      console.error(`✗ Missing ${file} — run \`bun install\` first.`)
-      process.exit(1)
-    }
-
-    await Bun.write(`${DEST_DIR}/${file}`, src)
-    console.log(`✓ Font: ${DEST_DIR}/${file}`)
-    count++
-  }
-
-  console.log(`Fonts synced — ${count} file(s) vendored from @fontsource.`)
-}
-
-// Allow running standalone: `bun run sync-fonts.js`
 if (import.meta.main) {
   await run()
 }
