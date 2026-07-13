@@ -2,6 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <!-- The degraded-mode gate (sets html.legacy on old/weak signage players) is
+         NOT inline here: the build injects it before the stylesheet from
+         @screenly-labs/signage-kit. That's why the html.legacy CSS rules exist
+         with no matching inline script in this source. -->
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-60S74VCHL8"></script>
     <script>

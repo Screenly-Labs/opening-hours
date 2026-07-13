@@ -20,9 +20,11 @@ const DIST = 'dist'
 const DOMAIN = 'opening-hours.srly.io'
 
 // The degraded-mode support floor, the CSS down-leveling recipe (cascade-layers
-// flatten + Lightning CSS), the JS bundler, and the inline degraded-mode gate all
-// come from @screenly-labs/signage-kit. This file only orchestrates the
-// app-specific steps. See the degraded-mode notes in index.html / tailwind.css.
+// flatten + Lightning CSS), the JS bundler, and the degraded-mode gate all come
+// from @screenly-labs/signage-kit. This file only orchestrates the app-specific
+// steps. The gate is no longer inline in index.html — it's injected at build
+// (injectGate below, before the first stylesheet); its source is the kit's
+// gate.js, and the matching html.legacy CSS rules live in tailwind.css.
 
 // 1. Vendor the Bun-managed webfonts into ./assets before copying.
 await syncFonts()
@@ -61,11 +63,23 @@ if ((await tailwind.exited) !== 0) {
   console.error('✗ Tailwind build failed')
   process.exit(1)
 }
-await writeFile(cssOut, await processCss(await readFile(cssOut, 'utf8'), { flattenLayers: true, filename: cssOut }))
+try {
+  await writeFile(cssOut, await processCss(await readFile(cssOut, 'utf8'), { flattenLayers: true, filename: cssOut }))
+} catch (error) {
+  console.error(`✗ CSS build failed (${cssOut})`)
+  console.error(error)
+  process.exit(1)
+}
 console.log(`✓ CSS: ${cssOut}`)
 
 // 4. Client TS -> the kit's bundler (self-contained IIFE at the floor's syntax level).
-await bundleJs('assets/static/js/main.ts', `${DIST}/static/js/main.js`)
+try {
+  await bundleJs('assets/static/js/main.ts', `${DIST}/static/js/main.js`)
+} catch (error) {
+  console.error('✗ JS build failed')
+  console.error(error)
+  process.exit(1)
+}
 console.log(`✓ JS: ${DIST}/static/js/main.js`)
 
 // 5. Cache-busting: hash the built JS + CSS so the token changes exactly when
