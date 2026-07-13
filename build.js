@@ -22,6 +22,12 @@ import { run as syncFonts } from './sync-fonts.js'
 
 const DIST = 'dist'
 const DOMAIN = 'opening-hours.srly.io'
+
+// The `browserslist` field in package.json is the CSS support floor: Lightning
+// CSS down-levels the stylesheet to it. The JS is lowered separately by esbuild to
+// a fixed ES2017 syntax floor (kept at/below the browserslist minimum); esbuild
+// can't read browserslist, so keep the two in sync if you change the floor. See
+// the degraded-mode notes in index.html / tailwind.css.
 const cssTargets = browserslistToTargets(browserslist())
 
 // 1. Vendor the Bun-managed webfonts into ./assets before copying.
@@ -32,6 +38,9 @@ await syncFonts()
 // are never minified in place.
 await rm(DIST, { recursive: true, force: true })
 await mkdir(`${DIST}/static`, { recursive: true })
+// Create the output subdirs up front so Tailwind/esbuild never race an absent dir.
+await mkdir(`${DIST}/static/styles`, { recursive: true })
+await mkdir(`${DIST}/static/js`, { recursive: true })
 await cp('assets/static/fonts', `${DIST}/static/fonts`, { recursive: true })
 await cp('assets/static/images', `${DIST}/static/images`, { recursive: true })
 await cp('index.html', `${DIST}/index.html`)
@@ -59,16 +68,22 @@ if ((await tailwind.exited) !== 0) {
   console.error('✗ Tailwind build failed')
   process.exit(1)
 }
-const flattened = await postcss([cascadeLayers()]).process(await readFile(cssOut, 'utf8'), {
-  from: cssOut
-})
-const { code: cssCode } = lightningcss({
-  filename: cssOut,
-  code: Buffer.from(flattened.css),
-  minify: true,
-  targets: cssTargets
-})
-await writeFile(cssOut, cssCode)
+try {
+  const flattened = await postcss([cascadeLayers()]).process(await readFile(cssOut, 'utf8'), {
+    from: cssOut
+  })
+  const { code: cssCode } = lightningcss({
+    filename: cssOut,
+    code: Buffer.from(flattened.css),
+    minify: true,
+    targets: cssTargets
+  })
+  await writeFile(cssOut, cssCode)
+} catch (err) {
+  console.error(`✗ CSS build failed (${cssOut})`)
+  console.error(err)
+  process.exit(1)
+}
 console.log(`✓ CSS: ${cssOut} (Tailwind → cascade-layers flatten → Lightning CSS)`)
 
 // 4. TypeScript → browser JS with esbuild. Bundles main.ts (inlining
