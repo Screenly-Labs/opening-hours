@@ -1,7 +1,10 @@
-// Browser entry. Bun bundles this (inlining ./opening-hours) into a
+// Browser entry. esbuild bundles this (inlining ./opening-hours) into a
 // self-contained classic script with no exports, so it loads from a plain
 // <script>. Keep it export-free and free of top-level await.
 
+// Side-effect import: installs the replaceChildren shim for the older-browser
+// degraded mode. Must stay first so the shim is in place before any render.
+import './polyfills'
 import {
   DAY_KEYS,
   DAY_LABELS,
