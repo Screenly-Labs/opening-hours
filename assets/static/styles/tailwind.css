@@ -10,13 +10,18 @@
    ========================================================================= */
 
 @import 'tailwindcss';
-/* Shared base (brand tokens + the degraded-mode kill-switch) from
+/* Shared base (brand/font tokens + fluid root + the degraded-mode kill-switch)
+   and the canonical @font-face set + standardized footer badge, all from
    @screenly-labs/signage-kit. The app's own @theme + component styles below layer
    on top; the design identity stays here, per-app — including this app's own
-   fluid root (:root font-size clamp, in @layer base below). */
+   fluid root (tuned via --root-* in @layer base below) and its subset .stage. */
 @import '@screenly-labs/signage-kit/styles/preset.css';
+@import '@screenly-labs/signage-kit/styles/fonts.css';
+@import '@screenly-labs/signage-kit/styles/brand.css';
 
-/* Design tokens — also generate utilities (bg-open, text-gilt, font-display…). */
+/* Design tokens — also generate utilities (bg-open, text-gilt…). --font-sans
+   (Hanken Grotesk) comes from the kit preset; --font-display overrides it to
+   Bricolage Grotesque, this app's display face. */
 @theme {
   --color-paper: #f4efe4;
   --color-open: #0f3d33; /* storefront viridian */
@@ -25,32 +30,17 @@
   --color-jade: #4ecb8f; /* "open" signal */
   --color-rose: #d98a6a; /* "closed" signal */
   --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
-  --font-sans: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
-}
-
-/* Webfonts: self-hosted, vendored from Bun-managed @fontsource (sync-fonts.js).
-   Bricolage "standard" = optical-size + weight + width; Hanken = weight. */
-@font-face {
-  font-family: 'Bricolage Grotesque';
-  font-style: normal;
-  font-weight: 200 800;
-  font-display: swap;
-  src: url('/static/fonts/bricolage-grotesque-latin-standard-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Hanken Grotesk';
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url('/static/fonts/hanken-grotesk-latin-wght-normal.woff2') format('woff2');
 }
 
 @layer base {
-  /* One fluid root drives the whole scale; vw+vh keeps it orientation-neutral so
-     portrait and landscape resolve to the same type size. Children size in rem,
-     so the layout scales cleanly from 480px → 4K with no breakpoints. */
+  /* Tune the kit's fluid root (clamp of vw+vh) for this design; the clamp itself
+     lives in the preset. It's orientation-neutral so portrait and landscape
+     resolve to the same type size, and children size in rem, so the layout
+     scales cleanly from 480px → 4K with no breakpoints. */
   :root {
-    font-size: clamp(17px, 1vw + 1vh, 54px);
+    --root-min: 17px;
+    --root-gain: 1;
+    --root-max: 54px;
     /* --ground and --signal flip with data-status; default to the closed look so
        the board is composed (never blank) before JS resolves the real state. */
     --ground: var(--color-closed);
@@ -248,27 +238,6 @@
     letter-spacing: 0.01em;
     color: var(--dim);
     text-wrap: balance;
-  }
-
-  /* ---- Brand ------------------------------------------------------------- */
-  .brand {
-    position: fixed;
-    right: clamp(1rem, 3.2vmin, 2.4rem);
-    bottom: clamp(1rem, 3.2vmin, 2.4rem);
-    display: block;
-    opacity: 0.5;
-    transition: opacity 200ms ease;
-    border-radius: 4px;
-    outline-offset: 6px;
-  }
-  .brand:hover,
-  .brand:focus-visible {
-    opacity: 0.9;
-  }
-  .brand img {
-    display: block;
-    width: auto;
-    height: clamp(13px, 1.3rem, 26px);
   }
 }
 
