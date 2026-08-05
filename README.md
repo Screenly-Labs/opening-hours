@@ -82,9 +82,16 @@ Verified landscape **and** portrait across:
 
 ## Deploy
 
-Push to `master` runs `.github/workflows/deploy-pages.yml`, which builds and
-publishes `dist/` to GitHub Pages. CI (`ci.yml`) typechecks, lints, tests, and
-builds on every PR.
+Deploys are **tag-driven**. Pushing a CalVer tag (`YYYY.N`, e.g. `2026.8.0`)
+runs `.github/workflows/deploy-pages.yml`, which builds and publishes `dist/` to
+GitHub Pages; it can also be run by hand from the Actions tab
+(`workflow_dispatch`). Pushing to `master` on its own does **not** deploy.
+
+CI (`ci.yml`) typechecks, lints, tests, and builds on every PR.
+
+```sh
+git tag 2026.8.0 && git push origin 2026.8.0   # cut a release
+```
 
 One-time setup (outside this repo):
 
