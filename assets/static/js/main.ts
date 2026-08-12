@@ -5,7 +5,9 @@
 // Side-effect import: installs the replaceChildren shim for the older-browser
 // degraded mode. Must stay first so the shim is in place before any render.
 import '@screenly-labs/signage-kit/polyfills'
+import { trackPlayer } from '@screenly-labs/signage-kit/analytics'
 import { removeScreenlyBranding } from '@screenly-labs/signage-kit/branding'
+import { detectPlayer } from '@screenly-labs/signage-kit/profiler'
 import {
   DAY_KEYS,
   DAY_LABELS,
@@ -101,6 +103,21 @@ const render = (params: URLSearchParams): void => {
 const init = (): void => {
   removeScreenlyBranding()
   const params = new URLSearchParams(window.location.search || `?${EXAMPLE}`)
+  // Report which player is showing this, and how the venue set it up. `hour_format` is
+  // resolved rather than raw: prefers24h() falls back to the timezone's own convention
+  // when `format` is absent, so reporting the raw param would call most screens
+  // "unset" when they are in fact showing a 24-hour board. `configured` separates a real
+  // venue from a screen still showing the built-in example.
+  trackPlayer(detectPlayer(), {
+    app: 'opening-hours',
+    config: {
+      configured: window.location.search ? 1 : 0,
+      hour_format: prefers24h(params.get('format') || '', params.get('tz') || undefined)
+        ? '24'
+        : '12',
+      has_timezone: params.get('tz') ? 1 : 0
+    }
+  })
   render(params)
   // Keep "Open now" and the today marker honest without a reload: repaint each
   // minute so the status flips exactly on the boundary.
