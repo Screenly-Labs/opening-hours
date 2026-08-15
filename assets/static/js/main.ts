@@ -110,6 +110,7 @@ const init = (): void => {
   // venue from a screen still showing the built-in example.
   trackPlayer(detectPlayer(), {
     app: 'opening-hours',
+    sendPageView: true,
     config: {
       configured: window.location.search ? 1 : 0,
       hour_format: prefers24h(params.get('format') || '', params.get('tz') || undefined)
